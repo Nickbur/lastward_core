@@ -19,39 +19,39 @@ export const MIN_GRACE_HOURS = 48;
 
 /** The check-in deadline for a given check-in instant (calendar-aware via date-fns). */
 export function computeNextDeadline(from: Date, cadence: CheckinCadence): Date {
-  switch (cadence.unit) {
-    case 'day':
-      return addDays(from, cadence.value);
-    case 'week':
-      return addWeeks(from, cadence.value);
-    case 'month':
-      return addMonths(from, cadence.value);
-    default:
-      return addDays(from, cadence.value);
-  }
+    switch (cadence.unit) {
+        case 'day':
+            return addDays(from, cadence.value);
+        case 'week':
+            return addWeeks(from, cadence.value);
+        case 'month':
+            return addMonths(from, cadence.value);
+        default:
+            return addDays(from, cadence.value);
+    }
 }
 
 /** Configured grace expressed in hours (before applying the floor). */
 export function graceHours(grace: GraceConfig): number {
-  return grace.unit === 'day' ? grace.value * 24 : grace.value;
+    return grace.unit === 'day' ? grace.value * 24 : grace.value;
 }
 
 /** The instant the switch fires: deadline + max(configured grace, 48h floor). */
 export function graceEndsAt(nextDeadline: Date, grace: GraceConfig): Date {
-  const hours = Math.max(graceHours(grace), MIN_GRACE_HOURS);
-  return addHours(nextDeadline, hours);
+    const hours = Math.max(graceHours(grace), MIN_GRACE_HOURS);
+    return addHours(nextDeadline, hours);
 }
 
 /** Deterministic ledger key for one warning step in the current check-in cycle. */
 export function warningStepKey(nextDeadline: Date, index: number): string {
-  return `${nextDeadline.toISOString()}:${index}`;
+    return `${nextDeadline.toISOString()}:${index}`;
 }
 
 export interface DueWarning {
-  index: number;
-  step: WarningStep;
-  fireAt: Date;
-  stepKey: string;
+    index: number;
+    step: WarningStep;
+    fireAt: Date;
+    stepKey: string;
 }
 
 /**
@@ -60,22 +60,22 @@ export interface DueWarning {
  * offset lands at/after the grace end is dropped — no point warning after firing.
  */
 export function dueWarnings(
-  nextDeadline: Date,
-  warnings: WarningStep[],
-  graceEnd: Date,
-  now: Date,
+    nextDeadline: Date,
+    warnings: WarningStep[],
+    graceEnd: Date,
+    now: Date,
 ): DueWarning[] {
-  const out: DueWarning[] = [];
-  warnings.forEach((step, index) => {
-    const fireAt = addHours(nextDeadline, step.offsetHours);
-    if (fireAt <= now && fireAt < graceEnd) {
-      out.push({ index, step, fireAt, stepKey: warningStepKey(nextDeadline, index) });
-    }
-  });
-  return out;
+    const out: DueWarning[] = [];
+    warnings.forEach((step, index) => {
+        const fireAt = addHours(nextDeadline, step.offsetHours);
+        if (fireAt <= now && fireAt < graceEnd) {
+            out.push({ index, step, fireAt, stepKey: warningStepKey(nextDeadline, index) });
+        }
+    });
+    return out;
 }
 
 /** Whether the switch should fire now (grace window fully elapsed). */
 export function shouldFire(nextDeadline: Date, grace: GraceConfig, now: Date): boolean {
-  return now >= graceEndsAt(nextDeadline, grace);
+    return now >= graceEndsAt(nextDeadline, grace);
 }

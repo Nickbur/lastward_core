@@ -7,16 +7,16 @@ import { db, pool } from './client.js';
  * before starting the server, so a fresh `docker compose up` is schema-ready.
  */
 async function main(): Promise<void> {
-  // eslint-disable-next-line no-console
-  console.log('[migrate] applying migrations…');
-  await migrate(db, { migrationsFolder: './drizzle/migrations' });
-  // eslint-disable-next-line no-console
-  console.log('[migrate] done.');
-  await pool.end();
+    // eslint-disable-next-line no-console
+    console.log('[migrate] applying migrations…');
+    await migrate(db, { migrationsFolder: './drizzle/migrations' });
+    // eslint-disable-next-line no-console
+    console.log('[migrate] done.');
+    await pool.end();
 }
 
 main().catch((err) => {
-  // eslint-disable-next-line no-console
-  console.error('[migrate] failed:', err);
-  process.exit(1);
+    // eslint-disable-next-line no-console
+    console.error('[migrate] failed:', err);
+    process.exit(1);
 });

@@ -7,14 +7,14 @@ import { defineConfig } from 'drizzle-kit';
 const url = process.env.DATABASE_URL ?? 'postgres://placeholder@localhost:5432/lastward';
 
 export default defineConfig({
-  // Points at the COMPILED schema (run `npm run build` first — the `db:generate`
-  // script does this automatically). drizzle-kit's loader cannot resolve NodeNext
-  // `.js` specifiers inside the TS source, but the compiled JS resolves cleanly.
-  // Keeps the app on standard NodeNext + explicit `.js` extensions everywhere.
-  schema: './dist/db/schema.js',
-  out: './drizzle/migrations',
-  dialect: 'postgresql',
-  dbCredentials: { url },
-  verbose: true,
-  strict: true,
+    // Points at the COMPILED schema (run `npm run build` first — the `db:generate`
+    // script does this automatically). drizzle-kit's loader cannot resolve NodeNext
+    // `.js` specifiers inside the TS source, but the compiled JS resolves cleanly.
+    // Keeps the app on standard NodeNext + explicit `.js` extensions everywhere.
+    schema: './dist/db/schema.js',
+    out: './drizzle/migrations',
+    dialect: 'postgresql',
+    dbCredentials: { url },
+    verbose: true,
+    strict: true,
 });

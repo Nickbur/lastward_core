@@ -1,16 +1,16 @@
 import type { FastifyInstance } from 'fastify';
 import { requireOwner } from './auth.js';
 import {
-  checkinHandler,
-  deleteSwitchHandler,
-  disarmHandler,
-  getSwitchHandler,
-  listSwitchesHandler,
-  publicPageHandler,
-  putPayloadHandler,
-  putSwitchHandler,
-  releaseHandler,
-  releasePageHandler,
+    checkinHandler,
+    deleteSwitchHandler,
+    disarmHandler,
+    getSwitchHandler,
+    listSwitchesHandler,
+    publicPageHandler,
+    putPayloadHandler,
+    putSwitchHandler,
+    releaseHandler,
+    releasePageHandler,
 } from './handlers.js';
 
 /**
@@ -19,15 +19,15 @@ import {
  * — the public plugins below register separately and stay unauthenticated.
  */
 export async function ownerRoutes(fastify: FastifyInstance): Promise<void> {
-  fastify.addHook('preHandler', requireOwner);
+    fastify.addHook('preHandler', requireOwner);
 
-  fastify.get('/switches', listSwitchesHandler);
-  fastify.get('/switches/:id', getSwitchHandler);
-  fastify.put('/switches/:id', putSwitchHandler);
-  fastify.delete('/switches/:id', deleteSwitchHandler);
-  fastify.post('/switches/:id/checkin', checkinHandler);
-  fastify.post('/switches/:id/disarm', disarmHandler);
-  fastify.put('/switches/:id/actions/:actionId/payload', putPayloadHandler);
+    fastify.get('/switches', listSwitchesHandler);
+    fastify.get('/switches/:id', getSwitchHandler);
+    fastify.put('/switches/:id', putSwitchHandler);
+    fastify.delete('/switches/:id', deleteSwitchHandler);
+    fastify.post('/switches/:id/checkin', checkinHandler);
+    fastify.post('/switches/:id/disarm', disarmHandler);
+    fastify.put('/switches/:id/actions/:actionId/payload', putPayloadHandler);
 }
 
 /**
@@ -37,7 +37,7 @@ export async function ownerRoutes(fastify: FastifyInstance): Promise<void> {
  * recipient decrypts in the browser.
  */
 export async function publicApiRoutes(fastify: FastifyInstance): Promise<void> {
-  fastify.get('/release/:token', releaseHandler);
+    fastify.get('/release/:token', releaseHandler);
 }
 
 /**
@@ -45,6 +45,6 @@ export async function publicApiRoutes(fastify: FastifyInstance): Promise<void> {
  * page and the self-host-only public "leak" page.
  */
 export async function publicPageRoutes(fastify: FastifyInstance): Promise<void> {
-  fastify.get('/release/:token', releasePageHandler);
-  fastify.get('/p/:slug', publicPageHandler);
+    fastify.get('/release/:token', releasePageHandler);
+    fastify.get('/p/:slug', publicPageHandler);
 }

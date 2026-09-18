@@ -1,13 +1,13 @@
 import {
-  index,
-  integer,
-  jsonb,
-  pgTable,
-  text,
-  timestamp,
-  uniqueIndex,
-  uuid,
-  varchar,
+    index,
+    integer,
+    jsonb,
+    pgTable,
+    text,
+    timestamp,
+    uniqueIndex,
+    uuid,
+    varchar,
 } from 'drizzle-orm/pg-core';
 import { uuidv7 } from '../shared/id.js';
 
@@ -43,20 +43,20 @@ export type WarnChannel = 'push' | 'email' | 'sms';
 
 /** How often the owner must check in. */
 export interface CheckinCadence {
-  value: number;
-  unit: CadenceUnit;
+    value: number;
+    unit: CadenceUnit;
 }
 
 /** After the deadline passes, how long before the switch fires. Floor: 48h (enforced). */
 export interface GraceConfig {
-  value: number;
-  unit: GraceUnit;
+    value: number;
+    unit: GraceUnit;
 }
 
 /** One escalation step, `offsetHours` AFTER the deadline (0 = at the deadline). */
 export interface WarningStep {
-  offsetHours: number;
-  channels: WarnChannel[];
+    offsetHours: number;
+    channels: WarnChannel[];
 }
 
 /** active = before deadline; grace = deadline passed, warnings running; then fired. */
@@ -72,66 +72,66 @@ export type ActionType = 'message' | 'file' | 'secret' | 'private_page' | 'publi
 
 /** Per-action config (server-readable metadata only; never the ZK plaintext). */
 export interface ActionConfig {
-  /** 'zk' = end-to-end encrypted (server blind); 'readable' = server-composed plaintext. */
-  mode: 'zk' | 'readable';
-  /** Optional display metadata (subject/title, original filename, mime) — no secret content. */
-  subject?: string;
-  filename?: string;
-  mimeType?: string;
-  /** For `public_page`: the desired public slug (`/p/:slug`). Auto-generated when absent. */
-  slug?: string;
+    /** 'zk' = end-to-end encrypted (server blind); 'readable' = server-composed plaintext. */
+    mode: 'zk' | 'readable';
+    /** Optional display metadata (subject/title, original filename, mime) — no secret content. */
+    subject?: string;
+    filename?: string;
+    mimeType?: string;
+    /** For `public_page`: the desired public slug (`/p/:slug`). Auto-generated when absent. */
+    slug?: string;
 }
 
 /** The defaults a new switch gets (the "Balanced" preset). */
 export function defaultCadence(): CheckinCadence {
-  return { value: 30, unit: 'day' };
+    return { value: 30, unit: 'day' };
 }
 export function defaultGrace(): GraceConfig {
-  return { value: 14, unit: 'day' };
+    return { value: 14, unit: 'day' };
 }
 export function defaultWarnings(): WarningStep[] {
-  return [
-    { offsetHours: 0, channels: ['push', 'email'] },
-    { offsetHours: 72, channels: ['push', 'email'] },
-    { offsetHours: 168, channels: ['push', 'email'] },
-  ];
+    return [
+        { offsetHours: 0, channels: ['push', 'email'] },
+        { offsetHours: 72, channels: ['push', 'email'] },
+        { offsetHours: 168, channels: ['push', 'email'] },
+    ];
 }
 
 // --- Tables ------------------------------------------------------------------
 
 export const switches = pgTable(
-  'lastward_switches',
-  {
-    id: uuid('id').primaryKey().$defaultFn(uuidv7),
+    'lastward_switches',
+    {
+        id: uuid('id').primaryKey().$defaultFn(uuidv7),
 
-    title: varchar('title', { length: 300 }).notNull(),
+        title: varchar('title', { length: 300 }).notNull(),
 
-    /** Lifecycle state — SERVER-AUTHORITATIVE, advanced only by the sweep + check-in. */
-    state: varchar('state', { length: 16 }).$type<SwitchState>().default('active').notNull(),
+        /** Lifecycle state — SERVER-AUTHORITATIVE, advanced only by the sweep + check-in. */
+        state: varchar('state', { length: 16 }).$type<SwitchState>().default('active').notNull(),
 
-    /** Owner-editable safety config, stored verbatim from the client model. */
-    cadence: jsonb('cadence').$type<CheckinCadence>().default(defaultCadence()).notNull(),
-    grace: jsonb('grace').$type<GraceConfig>().default(defaultGrace()).notNull(),
-    warnings: jsonb('warnings').$type<WarningStep[]>().default(defaultWarnings()).notNull(),
+        /** Owner-editable safety config, stored verbatim from the client model. */
+        cadence: jsonb('cadence').$type<CheckinCadence>().default(defaultCadence()).notNull(),
+        grace: jsonb('grace').$type<GraceConfig>().default(defaultGrace()).notNull(),
+        warnings: jsonb('warnings').$type<WarningStep[]>().default(defaultWarnings()).notNull(),
 
-    /** Optional phone for SMS warnings to the OWNER (console-only in the core). */
-    warningPhone: varchar('warning_phone', { length: 32 }),
+        /** Optional phone for SMS warnings to the OWNER (console-only in the core). */
+        warningPhone: varchar('warning_phone', { length: 32 }),
 
-    /** Proof-of-life bookkeeping. `nextDeadline` = lastCheckinAt + cadence (denormalized, indexed). */
-    lastCheckinAt: timestamp('last_checkin_at', { withTimezone: true }).defaultNow().notNull(),
-    nextDeadline: timestamp('next_deadline', { withTimezone: true }).notNull(),
+        /** Proof-of-life bookkeeping. `nextDeadline` = lastCheckinAt + cadence (denormalized, indexed). */
+        lastCheckinAt: timestamp('last_checkin_at', { withTimezone: true }).defaultNow().notNull(),
+        nextDeadline: timestamp('next_deadline', { withTimezone: true }).notNull(),
 
-    armedAt: timestamp('armed_at', { withTimezone: true }),
-    firedAt: timestamp('fired_at', { withTimezone: true }),
-    disarmedAt: timestamp('disarmed_at', { withTimezone: true }),
+        armedAt: timestamp('armed_at', { withTimezone: true }),
+        firedAt: timestamp('fired_at', { withTimezone: true }),
+        disarmedAt: timestamp('disarmed_at', { withTimezone: true }),
 
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-  },
-  (table) => ({
-    deadlineIdx: index('lastward_switches_deadline_idx').on(table.nextDeadline),
-    stateIdx: index('lastward_switches_state_idx').on(table.state),
-  }),
+        createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+        updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+    },
+    (table) => ({
+        deadlineIdx: index('lastward_switches_deadline_idx').on(table.nextDeadline),
+        stateIdx: index('lastward_switches_state_idx').on(table.state),
+    }),
 );
 
 export type SwitchRow = typeof switches.$inferSelect;
@@ -139,41 +139,41 @@ export type NewSwitch = typeof switches.$inferInsert;
 
 /** Recipients of a switch. Server-readable (the address is needed to deliver). */
 export const switchRecipients = pgTable(
-  'lastward_switch_recipients',
-  {
-    id: uuid('id').primaryKey().$defaultFn(uuidv7),
-    switchId: uuid('switch_id')
-      .references(() => switches.id, { onDelete: 'cascade' })
-      .notNull(),
-    email: varchar('email', { length: 320 }).notNull(),
-    phone: varchar('phone', { length: 32 }),
-    name: varchar('name', { length: 200 }),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  },
-  (table) => ({
-    switchIdx: index('lastward_recipients_switch_idx').on(table.switchId),
-  }),
+    'lastward_switch_recipients',
+    {
+        id: uuid('id').primaryKey().$defaultFn(uuidv7),
+        switchId: uuid('switch_id')
+            .references(() => switches.id, { onDelete: 'cascade' })
+            .notNull(),
+        email: varchar('email', { length: 320 }).notNull(),
+        phone: varchar('phone', { length: 32 }),
+        name: varchar('name', { length: 200 }),
+        createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    },
+    (table) => ({
+        switchIdx: index('lastward_recipients_switch_idx').on(table.switchId),
+    }),
 );
 
 export type SwitchRecipientRow = typeof switchRecipients.$inferSelect;
 
 /** The composable actions of a switch (metadata only; the encrypted body is in `switch_payloads`). */
 export const switchActions = pgTable(
-  'lastward_switch_actions',
-  {
-    id: uuid('id').primaryKey().$defaultFn(uuidv7),
-    switchId: uuid('switch_id')
-      .references(() => switches.id, { onDelete: 'cascade' })
-      .notNull(),
-    type: varchar('type', { length: 24 }).$type<ActionType>().notNull(),
-    sortOrder: integer('sort_order').default(0).notNull(),
-    config: jsonb('config').$type<ActionConfig>().notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-  },
-  (table) => ({
-    switchIdx: index('lastward_actions_switch_idx').on(table.switchId),
-  }),
+    'lastward_switch_actions',
+    {
+        id: uuid('id').primaryKey().$defaultFn(uuidv7),
+        switchId: uuid('switch_id')
+            .references(() => switches.id, { onDelete: 'cascade' })
+            .notNull(),
+        type: varchar('type', { length: 24 }).$type<ActionType>().notNull(),
+        sortOrder: integer('sort_order').default(0).notNull(),
+        config: jsonb('config').$type<ActionConfig>().notNull(),
+        createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+        updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+    },
+    (table) => ({
+        switchIdx: index('lastward_actions_switch_idx').on(table.switchId),
+    }),
 );
 
 export type SwitchActionRow = typeof switchActions.$inferSelect;
@@ -185,39 +185,39 @@ export type SwitchActionRow = typeof switchActions.$inferSelect;
  * `readableContent`. Large files are externalized by `blobRef`.
  */
 export const switchPayloads = pgTable(
-  'lastward_switch_payloads',
-  {
-    id: uuid('id').primaryKey().$defaultFn(uuidv7),
-    switchId: uuid('switch_id')
-      .references(() => switches.id, { onDelete: 'cascade' })
-      .notNull(),
-    actionId: uuid('action_id')
-      .references(() => switchActions.id, { onDelete: 'cascade' })
-      .notNull(),
-    /** 'zk' (server blind) or 'readable' (plaintext content, disclosed). */
-    mode: varchar('mode', { length: 12 }).$type<'zk' | 'readable'>().notNull(),
+    'lastward_switch_payloads',
+    {
+        id: uuid('id').primaryKey().$defaultFn(uuidv7),
+        switchId: uuid('switch_id')
+            .references(() => switches.id, { onDelete: 'cascade' })
+            .notNull(),
+        actionId: uuid('action_id')
+            .references(() => switchActions.id, { onDelete: 'cascade' })
+            .notNull(),
+        /** 'zk' (server blind) or 'readable' (plaintext content, disclosed). */
+        mode: varchar('mode', { length: 12 }).$type<'zk' | 'readable'>().notNull(),
 
-    /** ZK envelope — opaque to the server. */
-    ciphertext: varchar('ciphertext', { length: 2_000_000 }),
-    wrappedKey: varchar('wrapped_key', { length: 4096 }),
-    salt: varchar('salt', { length: 512 }),
-    nonce: varchar('nonce', { length: 512 }),
-    algo: varchar('algo', { length: 64 }),
-    /** Externalized ciphertext blob (uploaded file), referenced not inlined. */
-    blobRef: varchar('blob_ref', { length: 512 }),
-    size: integer('size'),
+        /** ZK envelope — opaque to the server. */
+        ciphertext: varchar('ciphertext', { length: 2_000_000 }),
+        wrappedKey: varchar('wrapped_key', { length: 4096 }),
+        salt: varchar('salt', { length: 512 }),
+        nonce: varchar('nonce', { length: 512 }),
+        algo: varchar('algo', { length: 64 }),
+        /** Externalized ciphertext blob (uploaded file), referenced not inlined. */
+        blobRef: varchar('blob_ref', { length: 512 }),
+        size: integer('size'),
 
-    /** Readable-mode content (server-composed message or public-page body). Null for ZK. */
-    readableContent: varchar('readable_content', { length: 200_000 }),
+        /** Readable-mode content (server-composed message or public-page body). Null for ZK. */
+        readableContent: varchar('readable_content', { length: 200_000 }),
 
-    schemaVersion: integer('schema_version').default(1).notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-  },
-  (table) => ({
-    switchIdx: index('lastward_payloads_switch_idx').on(table.switchId),
-    actionUniq: uniqueIndex('lastward_payloads_action_uniq').on(table.actionId),
-  }),
+        schemaVersion: integer('schema_version').default(1).notNull(),
+        createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+        updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+    },
+    (table) => ({
+        switchIdx: index('lastward_payloads_switch_idx').on(table.switchId),
+        actionUniq: uniqueIndex('lastward_payloads_action_uniq').on(table.actionId),
+    }),
 );
 
 export type SwitchPayloadRow = typeof switchPayloads.$inferSelect;
@@ -227,21 +227,21 @@ export type SwitchPayloadRow = typeof switchPayloads.$inferSelect;
  * payloads on the public release page — no account required. Issued at fire time.
  */
 export const releaseTokens = pgTable(
-  'lastward_release_tokens',
-  {
-    token: varchar('token', { length: 64 }).primaryKey(),
-    switchId: uuid('switch_id')
-      .references(() => switches.id, { onDelete: 'cascade' })
-      .notNull(),
-    recipientId: uuid('recipient_id')
-      .references(() => switchRecipients.id, { onDelete: 'cascade' })
-      .notNull(),
-    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  },
-  (table) => ({
-    switchIdx: index('lastward_release_tokens_switch_idx').on(table.switchId),
-  }),
+    'lastward_release_tokens',
+    {
+        token: varchar('token', { length: 64 }).primaryKey(),
+        switchId: uuid('switch_id')
+            .references(() => switches.id, { onDelete: 'cascade' })
+            .notNull(),
+        recipientId: uuid('recipient_id')
+            .references(() => switchRecipients.id, { onDelete: 'cascade' })
+            .notNull(),
+        expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+        createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    },
+    (table) => ({
+        switchIdx: index('lastward_release_tokens_switch_idx').on(table.switchId),
+    }),
 );
 
 export type ReleaseTokenRow = typeof releaseTokens.$inferSelect;
@@ -253,24 +253,24 @@ export type ReleaseTokenRow = typeof releaseTokens.$inferSelect;
  * subject to the retention purge — a published leak is meant to stay up.
  */
 export const publicPages = pgTable(
-  'lastward_public_pages',
-  {
-    slug: varchar('slug', { length: 128 }).primaryKey(),
-    switchId: uuid('switch_id')
-      .references(() => switches.id, { onDelete: 'cascade' })
-      .notNull(),
-    /** One published page per action (idempotent publish on a sweep retry). */
-    actionId: uuid('action_id')
-      .references(() => switchActions.id, { onDelete: 'cascade' })
-      .notNull(),
-    title: varchar('title', { length: 300 }).notNull(),
-    content: text('content').notNull(),
-    publishedAt: timestamp('published_at', { withTimezone: true }).defaultNow().notNull(),
-  },
-  (table) => ({
-    switchIdx: index('lastward_public_pages_switch_idx').on(table.switchId),
-    actionUniq: uniqueIndex('lastward_public_pages_action_uniq').on(table.actionId),
-  }),
+    'lastward_public_pages',
+    {
+        slug: varchar('slug', { length: 128 }).primaryKey(),
+        switchId: uuid('switch_id')
+            .references(() => switches.id, { onDelete: 'cascade' })
+            .notNull(),
+        /** One published page per action (idempotent publish on a sweep retry). */
+        actionId: uuid('action_id')
+            .references(() => switchActions.id, { onDelete: 'cascade' })
+            .notNull(),
+        title: varchar('title', { length: 300 }).notNull(),
+        content: text('content').notNull(),
+        publishedAt: timestamp('published_at', { withTimezone: true }).defaultNow().notNull(),
+    },
+    (table) => ({
+        switchIdx: index('lastward_public_pages_switch_idx').on(table.switchId),
+        actionUniq: uniqueIndex('lastward_public_pages_action_uniq').on(table.actionId),
+    }),
 );
 
 export type PublicPageRow = typeof publicPages.$inferSelect;
@@ -285,23 +285,23 @@ export type PublicPageRow = typeof publicPages.$inferSelect;
  *                      `page:<actionId>` (publish each public page once).
  */
 export const switchDeliveries = pgTable(
-  'lastward_switch_deliveries',
-  {
-    id: uuid('id').primaryKey().$defaultFn(uuidv7),
-    switchId: uuid('switch_id')
-      .references(() => switches.id, { onDelete: 'cascade' })
-      .notNull(),
-    kind: varchar('kind', { length: 12 }).$type<'warning' | 'fire'>().notNull(),
-    stepKey: varchar('step_key', { length: 128 }).notNull(),
-    sentAt: timestamp('sent_at', { withTimezone: true }).defaultNow().notNull(),
-  },
-  (table) => ({
-    uniqSend: uniqueIndex('lastward_switch_deliveries_unique_idx').on(
-      table.switchId,
-      table.kind,
-      table.stepKey,
-    ),
-  }),
+    'lastward_switch_deliveries',
+    {
+        id: uuid('id').primaryKey().$defaultFn(uuidv7),
+        switchId: uuid('switch_id')
+            .references(() => switches.id, { onDelete: 'cascade' })
+            .notNull(),
+        kind: varchar('kind', { length: 12 }).$type<'warning' | 'fire'>().notNull(),
+        stepKey: varchar('step_key', { length: 128 }).notNull(),
+        sentAt: timestamp('sent_at', { withTimezone: true }).defaultNow().notNull(),
+    },
+    (table) => ({
+        uniqSend: uniqueIndex('lastward_switch_deliveries_unique_idx').on(
+            table.switchId,
+            table.kind,
+            table.stepKey,
+        ),
+    }),
 );
 
 export type SwitchDeliveryRow = typeof switchDeliveries.$inferSelect;

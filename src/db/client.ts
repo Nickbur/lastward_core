@@ -7,9 +7,9 @@ const { Pool } = pg;
 
 /** Shared PostgreSQL connection pool. */
 export const pool = new Pool({
-  connectionString: env.DATABASE_URL,
-  max: 10,
-  idleTimeoutMillis: 30_000,
+    connectionString: env.DATABASE_URL,
+    max: 10,
+    idleTimeoutMillis: 30_000,
 });
 
 /** Drizzle ORM instance bound to the full schema (enables the relational query API). */

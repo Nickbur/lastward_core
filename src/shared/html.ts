@@ -17,12 +17,12 @@
  */
 
 export function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+    return s
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
 
 const BASE_STYLE = `
@@ -54,8 +54,8 @@ const BASE_STYLE = `
 `;
 
 function doc(title: string, body: string, opts: { index: boolean }): string {
-  const robots = opts.index ? '' : '<meta name="robots" content="noindex,nofollow">';
-  return `<!doctype html>
+    const robots = opts.index ? '' : '<meta name="robots" content="noindex,nofollow">';
+    return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -72,16 +72,16 @@ ${body}
 
 /** The truly-public "leak" page. Indexable plaintext — this is the self-host-only action. */
 export function renderPublicPage(page: { title: string; content: string; publishedAt: Date }): string {
-  const body =
-    `<h1>${escapeHtml(page.title)}</h1>` +
-    `<p class="meta">Published ${escapeHtml(page.publishedAt.toUTCString())} via Lastward.</p>` +
-    `<div class="content">${escapeHtml(page.content)}</div>`;
-  return doc(page.title, body, { index: true });
+    const body =
+        `<h1>${escapeHtml(page.title)}</h1>` +
+        `<p class="meta">Published ${escapeHtml(page.publishedAt.toUTCString())} via Lastward.</p>` +
+        `<div class="content">${escapeHtml(page.content)}</div>`;
+    return doc(page.title, body, { index: true });
 }
 
 /** Simple 404 page for an unknown public slug. */
 export function renderNotFoundPage(message: string): string {
-  return doc('Not found', `<h1>Not found</h1><p class="muted">${escapeHtml(message)}</p>`, { index: false });
+    return doc('Not found', `<h1>Not found</h1><p class="muted">${escapeHtml(message)}</p>`, { index: false });
 }
 
 /**
@@ -90,9 +90,9 @@ export function renderNotFoundPage(message: string): string {
  * get a passphrase box + reference decryptor. Noindex — release links are private.
  */
 export function renderReleasePage(token: string): string {
-  // Encode the token for safe interpolation into a JS string literal.
-  const jsToken = JSON.stringify(token);
-  const body = `
+    // Encode the token for safe interpolation into a JS string literal.
+    const jsToken = JSON.stringify(token);
+    const body = `
 <h1 id="title">Release</h1>
 <p class="meta" id="meta"></p>
 <div id="root"><p class="muted">Loading…</p></div>
@@ -188,5 +188,5 @@ export function renderReleasePage(token: string): string {
     });
 })();
 </script>`;
-  return doc('Release', body, { index: false });
+    return doc('Release', body, { index: false });
 }

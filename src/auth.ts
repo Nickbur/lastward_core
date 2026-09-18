@@ -5,10 +5,10 @@ import { AuthError } from './shared/errors.js';
 
 /** Constant-time string compare (guards the owner token against timing attacks). */
 function safeEqual(a: string, b: string): boolean {
-  const ab = Buffer.from(a, 'utf8');
-  const bb = Buffer.from(b, 'utf8');
-  if (ab.length !== bb.length) return false;
-  return timingSafeEqual(ab, bb);
+    const ab = Buffer.from(a, 'utf8');
+    const bb = Buffer.from(b, 'utf8');
+    if (ab.length !== bb.length) return false;
+    return timingSafeEqual(ab, bb);
 }
 
 /**
@@ -18,12 +18,12 @@ function safeEqual(a: string, b: string): boolean {
  * stay unauthenticated.
  */
 export async function requireOwner(request: FastifyRequest): Promise<void> {
-  const header = request.headers.authorization;
-  if (!header || !header.startsWith('Bearer ')) {
-    throw new AuthError('unauthenticated', 'missing bearer token');
-  }
-  const token = header.slice('Bearer '.length).trim();
-  if (!token || !safeEqual(token, env.OWNER_TOKEN)) {
-    throw new AuthError('unauthenticated', 'invalid owner token');
-  }
+    const header = request.headers.authorization;
+    if (!header || !header.startsWith('Bearer ')) {
+        throw new AuthError('unauthenticated', 'missing bearer token');
+    }
+    const token = header.slice('Bearer '.length).trim();
+    if (!token || !safeEqual(token, env.OWNER_TOKEN)) {
+        throw new AuthError('unauthenticated', 'invalid owner token');
+    }
 }
