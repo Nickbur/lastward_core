@@ -65,8 +65,13 @@ const schema = z.object({
     FIRE_RETENTION_DAYS: z.coerce.number().int().positive().max(3650).default(90),
 
     // --- Email (optional) ------------------------------------------------------
-    /** Where owner check-in warning emails go. Unset ⇒ warnings are console-only. */
-    OWNER_EMAIL: z.string().email().optional(),
+    /**
+     * Where owner check-in warning emails go. Empty or unset ⇒ warnings are
+     * console-only. `.env` files carry an empty string rather than `undefined`
+     * (the documented "leave it blank" case), so an empty value is normalized to
+     * unset before the email check runs.
+     */
+    OWNER_EMAIL: z.preprocess((v) => (v === '' ? undefined : v), z.string().email().optional()),
     /** When true (or when SMTP_HOST is unset), email is printed to the console. */
     EMAIL_DEV_MODE: boolEnv(false),
     SMTP_HOST: z.string().optional(),

@@ -81,7 +81,15 @@ export async function buildApp(): Promise<FastifyInstance> {
 
     registerErrorHandler(app);
 
-    await app.register(cors, { origin: true, credentials: false });
+    // Browser clients (the Lastward app in self-host mode, or any web client) call
+    // the owner API with PUT/DELETE + custom headers, so CORS must allow the full
+    // method set explicitly — the default only covers the "simple" GET/HEAD/POST.
+    await app.register(cors, {
+        origin: true,
+        credentials: false,
+        methods: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'X-Client-Id', 'X-App-Version'],
+    });
     await app.register(rateLimit, { max: 300, timeWindow: '1 minute' });
 
     app.get('/health', async () => ({ status: 'ok' }));
