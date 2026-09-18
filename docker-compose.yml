@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lastward
+      POSTGRES_PASSWORD: lastward
+      POSTGRES_DB: lastward
+    volumes:
+      - lastward_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lastward -d lastward"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build: .
+    restart: unless-stopped
+    init: true
+    env_file:
+      - .env
+    environment:
+      # Force the in-container bind + DB host regardless of what .env carries, so
+      # the published port mapping below always matches.
+      PORT: "8080"
+      DATABASE_URL: "postgres://lastward:lastward@db:5432/lastward"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${PORT:-8080}:8080"
+
+volumes:
+  lastward_pgdata:
