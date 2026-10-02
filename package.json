@@ -22,6 +22,8 @@
         "typecheck": "tsc --noEmit",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
         "prepare": "husky || exit 0"
     },
     "dependencies": {
@@ -36,17 +38,23 @@
         "zod": "4.6.5"
     },
     "devDependencies": {
+        "@eslint/js": "10.0.1",
         "@types/node": "26.6.4",
         "@types/nodemailer": "8.0.2",
         "@types/pg": "8.23.1",
         "drizzle-kit": "0.31.11",
+        "eslint": "10.11.0",
+        "eslint-config-prettier": "10.1.8",
+        "globals": "17.13.0",
         "husky": "9.1.7",
         "lint-staged": "17.6.0",
         "prettier": "3.9.9",
         "tsx": "4.23.15",
-        "typescript": "6.0.3"
+        "typescript": "6.0.3",
+        "typescript-eslint": "8.71.0"
     },
     "lint-staged": {
+        "*.{js,mjs,cjs,ts,mts,cts}": "eslint --fix --no-warn-ignored",
         "*": "prettier --write --ignore-unknown"
     }
 }
