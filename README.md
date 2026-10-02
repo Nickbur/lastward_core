@@ -222,5 +222,5 @@ npm run db:migrate   # apply migrations (tsx)
 npm run sweep        # run the sweep once (tsx)
 ```
 
-Stack: Node 20+, TypeScript (ESM, NodeNext), Fastify 5, Drizzle ORM + PostgreSQL,
+Stack: Node 22.12+, TypeScript (ESM, NodeNext), Fastify 5, Drizzle ORM + PostgreSQL,
 Zod, nodemailer, date-fns.
