@@ -30,9 +30,7 @@ const schema = z.object({
     NODE_ENV: z.enum(['development', 'production', 'test']).default('production'),
     HOST: z.string().default('0.0.0.0'),
     PORT: z.coerce.number().int().positive().max(65535).default(8080),
-    LOG_LEVEL: z
-        .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
-        .default('info'),
+    LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
 
     /** PostgreSQL connection string. Required. */
     DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
@@ -84,9 +82,7 @@ const schema = z.object({
 
 const parsed = schema.safeParse(process.env);
 if (!parsed.success) {
-    const lines = parsed.error.issues.map(
-        (i) => `  - ${i.path.join('.') || '(root)'}: ${i.message}`,
-    );
+    const lines = parsed.error.issues.map((i) => `  - ${i.path.join('.') || '(root)'}: ${i.message}`);
     // eslint-disable-next-line no-console
     console.error(`[env] invalid configuration:\n${lines.join('\n')}`);
     process.exit(1);

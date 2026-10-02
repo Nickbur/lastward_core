@@ -141,18 +141,18 @@ device. The sweep (`src/sweep.ts`, run in-process or from cron):
 
 1. Transitions `active → grace` once the check-in deadline passes.
 2. Escalates the **due warnings** to the owner. Email is delivered via SMTP (or the
-   console without SMTP); **push and SMS are console-only** — the core ships no
-   OneSignal/Twilio, so you can wire your own provider. Owner warning emails go to
-   `OWNER_EMAIL` when set.
+    console without SMTP); **push and SMS are console-only** — the core ships no
+    OneSignal/Twilio, so you can wire your own provider. Owner warning emails go to
+    `OWNER_EMAIL` when set.
 3. Once the grace window (≥ 48h floor) elapses, **fires**: publishes any public
-   pages, then emails each recipient a tokenized release link (for ZK items) plus
-   any readable messages inline.
+    pages, then emails each recipient a tokenized release link (for ZK items) plus
+    any readable messages inline.
 4. Every delivery is **claimed** in an idempotency ledger before it is sent
-   (unique per `switch + kind + step`), and a failed *fire* delivery releases its
-   claim so a later sweep retries it — crashes, overlaps, and catch-up runs never
-   double-send.
+    (unique per `switch + kind + step`), and a failed *fire* delivery releases its
+    claim so a later sweep retries it — crashes, overlaps, and catch-up runs never
+    double-send.
 5. Purges expired release tokens and the payloads of switches fired past
-   `FIRE_RETENTION_DAYS`.
+    `FIRE_RETENTION_DAYS`.
 
 ### Reference crypto envelope
 
@@ -193,20 +193,20 @@ See `.env.example` for the full list. Essentials:
 This server is itself the continuity guarantee, but run it like one:
 
 - **Export your data regularly.** A plain `pg_dump` of the database captures every
-  switch config, recipient, action, and ciphertext payload — a complete, portable
-  backup independent of any host:
-  ```bash
-  docker compose exec db pg_dump -U lastward lastward > lastward-backup.sql
-  ```
-  Because payloads are stored as ciphertext, the dump is safe to keep offsite, and
-  it is enough to stand up an identical instance elsewhere.
+    switch config, recipient, action, and ciphertext payload — a complete, portable
+    backup independent of any host:
+    ```bash
+    docker compose exec db pg_dump -U lastward lastward > lastward-backup.sql
+    ```
+    Because payloads are stored as ciphertext, the dump is safe to keep offsite, and
+    it is enough to stand up an identical instance elsewhere.
 - **Publish your own shutdown protocol.** If *you* will stop operating an instance,
-  give your recipients advance, multi-channel notice, a final export, and a pointer
-  to this repository so they can self-host and keep the switches alive. The honest
-  disclosure is that "a service outlives its operator" is only *partially* solved —
-  open source + export is the escape hatch, not a magic guarantee.
+    give your recipients advance, multi-channel notice, a final export, and a pointer
+    to this repository so they can self-host and keep the switches alive. The honest
+    disclosure is that "a service outlives its operator" is only *partially* solved —
+    open source + export is the escape hatch, not a magic guarantee.
 - **Keep the passphrases out-of-band.** The server can never recover a ZK
-  passphrase. Make sure your recipients can obtain theirs even if you are gone.
+    passphrase. Make sure your recipients can obtain theirs even if you are gone.
 
 ---
 

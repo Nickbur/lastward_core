@@ -26,31 +26,31 @@ export function escapeHtml(s: string): string {
 }
 
 const BASE_STYLE = `
-  :root { color-scheme: light dark; }
-  body { font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif; line-height: 1.6;
-         max-width: 720px; margin: 0 auto; padding: 32px 20px; color: #1a1a1a; background: #fafafa; }
-  h1 { font-size: 1.6rem; margin: 0 0 4px; }
-  .meta { color: #6b7280; font-size: 0.85rem; margin: 0 0 24px; }
-  .content { white-space: pre-wrap; word-wrap: break-word; background: #fff; border: 1px solid #e5e7eb;
-             border-radius: 10px; padding: 20px; }
-  .action { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px 20px; margin: 0 0 16px; }
-  .action h3 { margin: 0 0 8px; font-size: 1rem; }
-  .tag { display: inline-block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
-         color: #6b7280; border: 1px solid #e5e7eb; border-radius: 999px; padding: 2px 8px; margin-left: 6px; }
-  input[type=password] { width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid #d1d5db;
-                         border-radius: 8px; font-size: 0.95rem; margin: 8px 0; }
-  button { background: #2563eb; color: #fff; border: 0; border-radius: 8px; padding: 10px 16px;
-           font-size: 0.95rem; cursor: pointer; }
-  button:disabled { opacity: 0.5; cursor: default; }
-  .muted { color: #6b7280; font-size: 0.85rem; }
-  .err { color: #b91c1c; font-size: 0.9rem; }
-  a.dl { display: inline-block; margin-top: 8px; }
-  @media (prefers-color-scheme: dark) {
-    body { color: #e5e7eb; background: #0b0b0c; }
-    .content, .action { background: #141416; border-color: #2a2a2e; }
-    .meta, .muted, .tag { color: #9ca3af; }
-    input[type=password] { background: #1c1c1f; border-color: #3a3a40; color: #e5e7eb; }
-  }
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif; line-height: 1.6;
+           max-width: 720px; margin: 0 auto; padding: 32px 20px; color: #1a1a1a; background: #fafafa; }
+    h1 { font-size: 1.6rem; margin: 0 0 4px; }
+    .meta { color: #6b7280; font-size: 0.85rem; margin: 0 0 24px; }
+    .content { white-space: pre-wrap; word-wrap: break-word; background: #fff; border: 1px solid #e5e7eb;
+               border-radius: 10px; padding: 20px; }
+    .action { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px 20px; margin: 0 0 16px; }
+    .action h3 { margin: 0 0 8px; font-size: 1rem; }
+    .tag { display: inline-block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
+           color: #6b7280; border: 1px solid #e5e7eb; border-radius: 999px; padding: 2px 8px; margin-left: 6px; }
+    input[type=password] { width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid #d1d5db;
+                           border-radius: 8px; font-size: 0.95rem; margin: 8px 0; }
+    button { background: #2563eb; color: #fff; border: 0; border-radius: 8px; padding: 10px 16px;
+             font-size: 0.95rem; cursor: pointer; }
+    button:disabled { opacity: 0.5; cursor: default; }
+    .muted { color: #6b7280; font-size: 0.85rem; }
+    .err { color: #b91c1c; font-size: 0.9rem; }
+    a.dl { display: inline-block; margin-top: 8px; }
+    @media (prefers-color-scheme: dark) {
+        body { color: #e5e7eb; background: #0b0b0c; }
+        .content, .action { background: #141416; border-color: #2a2a2e; }
+        .meta, .muted, .tag { color: #9ca3af; }
+        input[type=password] { background: #1c1c1f; border-color: #3a3a40; color: #e5e7eb; }
+    }
 `;
 
 function doc(title: string, body: string, opts: { index: boolean }): string {
@@ -99,93 +99,93 @@ export function renderReleasePage(token: string): string {
 <script src="https://cdn.jsdelivr.net/npm/libsodium-wrappers-sumo@0.7.15/dist/modules-sumo/libsodium-wrappers.js"></script>
 <script>
 (function () {
-  var TOKEN = ${jsToken};
-  var REF_ALGO = 'xchacha20poly1305-argon2id-v1';
-  var root = document.getElementById('root');
+    var TOKEN = ${jsToken};
+    var REF_ALGO = 'xchacha20poly1305-argon2id-v1';
+    var root = document.getElementById('root');
 
-  function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
+    function esc(s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
 
-  function b64(s) {
-    var bin = atob(String(s).replace(/-/g, '+').replace(/_/g, '/'));
-    var out = new Uint8Array(bin.length);
-    for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
-    return out;
-  }
-
-  async function decrypt(p, passphrase) {
-    await sodium.ready;
-    if (p.algo !== REF_ALGO) {
-      throw new Error('This page decrypts the "' + REF_ALGO + '" envelope. This item uses "' + (p.algo || 'unknown') + '" — use your Lastward client.');
-    }
-    var salt = b64(p.salt), wrapped = b64(p.wrappedKey), nonce = b64(p.nonce), ct = b64(p.ciphertext);
-    var kek = sodium.crypto_pwhash(32, passphrase, salt,
-      sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE, sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
-      sodium.crypto_pwhash_ALG_ARGON2ID13);
-    var wnonce = wrapped.slice(0, sodium.crypto_secretbox_NONCEBYTES);
-    var wbox = wrapped.slice(sodium.crypto_secretbox_NONCEBYTES);
-    var contentKey = sodium.crypto_secretbox_open_easy(wbox, wnonce, kek);
-    return sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(null, ct, null, nonce, contentKey);
-  }
-
-  function renderAction(a) {
-    var el = document.createElement('div');
-    el.className = 'action';
-    var label = a.type.replace('_', ' ');
-    el.innerHTML = '<h3>' + esc(a.config && a.config.subject ? a.config.subject : label) +
-      '<span class="tag">' + esc(label) + '</span></h3>';
-    var p = a.payload;
-    if (!p) { el.innerHTML += '<p class="muted">No content was stored for this item.</p>'; return el; }
-
-    if (p.mode === 'readable') {
-      var c = document.createElement('div'); c.className = 'content'; c.textContent = p.readableContent || '';
-      el.appendChild(c);
-      return el;
+    function b64(s) {
+        var bin = atob(String(s).replace(/-/g, '+').replace(/_/g, '/'));
+        var out = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+        return out;
     }
 
-    // Zero-knowledge: passphrase + decrypt.
-    var note = document.createElement('p'); note.className = 'muted';
-    note.textContent = 'Encrypted. Enter the passphrase the sender shared with you out-of-band.';
-    var input = document.createElement('input'); input.type = 'password'; input.placeholder = 'Passphrase';
-    var btn = document.createElement('button'); btn.textContent = 'Decrypt';
-    var out = document.createElement('div');
-    btn.onclick = async function () {
-      out.innerHTML = ''; btn.disabled = true; btn.textContent = 'Decrypting…';
-      try {
-        var bytes = await decrypt(p, input.value);
-        var fname = a.config && a.config.filename;
-        var mime = (a.config && a.config.mimeType) || 'application/octet-stream';
-        if (fname) {
-          var blob = new Blob([bytes], { type: mime });
-          var url = URL.createObjectURL(blob);
-          out.innerHTML = '<a class="dl" href="' + url + '" download="' + esc(fname) + '">Download ' + esc(fname) + '</a>';
-        } else {
-          var text = sodium.to_string(bytes);
-          var c = document.createElement('div'); c.className = 'content'; c.textContent = text; out.appendChild(c);
+    async function decrypt(p, passphrase) {
+        await sodium.ready;
+        if (p.algo !== REF_ALGO) {
+            throw new Error('This page decrypts the "' + REF_ALGO + '" envelope. This item uses "' + (p.algo || 'unknown') + '" — use your Lastward client.');
         }
-      } catch (e) {
-        out.innerHTML = '<p class="err">' + esc(e && e.message ? e.message : 'Could not decrypt — check the passphrase.') + '</p>';
-      } finally { btn.disabled = false; btn.textContent = 'Decrypt'; }
-    };
-    el.appendChild(note); el.appendChild(input); el.appendChild(btn); el.appendChild(out);
-    return el;
-  }
+        var salt = b64(p.salt), wrapped = b64(p.wrappedKey), nonce = b64(p.nonce), ct = b64(p.ciphertext);
+        var kek = sodium.crypto_pwhash(32, passphrase, salt,
+            sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE, sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+            sodium.crypto_pwhash_ALG_ARGON2ID13);
+        var wnonce = wrapped.slice(0, sodium.crypto_secretbox_NONCEBYTES);
+        var wbox = wrapped.slice(sodium.crypto_secretbox_NONCEBYTES);
+        var contentKey = sodium.crypto_secretbox_open_easy(wbox, wnonce, kek);
+        return sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(null, ct, null, nonce, contentKey);
+    }
 
-  fetch('/v1/release/' + encodeURIComponent(TOKEN))
-    .then(function (r) { if (!r.ok) throw new Error('invalid'); return r.json(); })
-    .then(function (bundle) {
-      document.getElementById('title').textContent = bundle.switchTitle || 'Release';
-      var m = [];
-      if (bundle.recipientName) m.push('For ' + bundle.recipientName);
-      if (bundle.firedAt) m.push('Released ' + new Date(bundle.firedAt).toUTCString());
-      document.getElementById('meta').textContent = m.join(' · ');
-      root.innerHTML = '';
-      var actions = bundle.actions || [];
-      if (!actions.length) { root.innerHTML = '<p class="muted">Nothing was left here.</p>'; return; }
-      actions.forEach(function (a) { root.appendChild(renderAction(a)); });
-    })
-    .catch(function () {
-      root.innerHTML = '<p class="err">This release link is not valid, has expired, or the switch has not fired.</p>';
-    });
+    function renderAction(a) {
+        var el = document.createElement('div');
+        el.className = 'action';
+        var label = a.type.replace('_', ' ');
+        el.innerHTML = '<h3>' + esc(a.config && a.config.subject ? a.config.subject : label) +
+            '<span class="tag">' + esc(label) + '</span></h3>';
+        var p = a.payload;
+        if (!p) { el.innerHTML += '<p class="muted">No content was stored for this item.</p>'; return el; }
+
+        if (p.mode === 'readable') {
+            var c = document.createElement('div'); c.className = 'content'; c.textContent = p.readableContent || '';
+            el.appendChild(c);
+            return el;
+        }
+
+        // Zero-knowledge: passphrase + decrypt.
+        var note = document.createElement('p'); note.className = 'muted';
+        note.textContent = 'Encrypted. Enter the passphrase the sender shared with you out-of-band.';
+        var input = document.createElement('input'); input.type = 'password'; input.placeholder = 'Passphrase';
+        var btn = document.createElement('button'); btn.textContent = 'Decrypt';
+        var out = document.createElement('div');
+        btn.onclick = async function () {
+            out.innerHTML = ''; btn.disabled = true; btn.textContent = 'Decrypting…';
+            try {
+                var bytes = await decrypt(p, input.value);
+                var fname = a.config && a.config.filename;
+                var mime = (a.config && a.config.mimeType) || 'application/octet-stream';
+                if (fname) {
+                    var blob = new Blob([bytes], { type: mime });
+                    var url = URL.createObjectURL(blob);
+                    out.innerHTML = '<a class="dl" href="' + url + '" download="' + esc(fname) + '">Download ' + esc(fname) + '</a>';
+                } else {
+                    var text = sodium.to_string(bytes);
+                    var c = document.createElement('div'); c.className = 'content'; c.textContent = text; out.appendChild(c);
+                }
+            } catch (e) {
+                out.innerHTML = '<p class="err">' + esc(e && e.message ? e.message : 'Could not decrypt — check the passphrase.') + '</p>';
+            } finally { btn.disabled = false; btn.textContent = 'Decrypt'; }
+        };
+        el.appendChild(note); el.appendChild(input); el.appendChild(btn); el.appendChild(out);
+        return el;
+    }
+
+    fetch('/v1/release/' + encodeURIComponent(TOKEN))
+        .then(function (r) { if (!r.ok) throw new Error('invalid'); return r.json(); })
+        .then(function (bundle) {
+            document.getElementById('title').textContent = bundle.switchTitle || 'Release';
+            var m = [];
+            if (bundle.recipientName) m.push('For ' + bundle.recipientName);
+            if (bundle.firedAt) m.push('Released ' + new Date(bundle.firedAt).toUTCString());
+            document.getElementById('meta').textContent = m.join(' · ');
+            root.innerHTML = '';
+            var actions = bundle.actions || [];
+            if (!actions.length) { root.innerHTML = '<p class="muted">Nothing was left here.</p>'; return; }
+            actions.forEach(function (a) { root.appendChild(renderAction(a)); });
+        })
+        .catch(function () {
+            root.innerHTML = '<p class="err">This release link is not valid, has expired, or the switch has not fired.</p>';
+        });
 })();
 </script>`;
     return doc('Release', body, { index: false });

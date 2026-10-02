@@ -1,14 +1,4 @@
-import {
-    index,
-    integer,
-    jsonb,
-    pgTable,
-    text,
-    timestamp,
-    uniqueIndex,
-    uuid,
-    varchar,
-} from 'drizzle-orm/pg-core';
+import { index, integer, jsonb, pgTable, text, timestamp, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
 import { uuidv7 } from '../shared/id.js';
 
 /**
@@ -296,11 +286,7 @@ export const switchDeliveries = pgTable(
         sentAt: timestamp('sent_at', { withTimezone: true }).defaultNow().notNull(),
     },
     (table) => ({
-        uniqSend: uniqueIndex('lastward_switch_deliveries_unique_idx').on(
-            table.switchId,
-            table.kind,
-            table.stepKey,
-        ),
+        uniqSend: uniqueIndex('lastward_switch_deliveries_unique_idx').on(table.switchId, table.kind, table.stepKey),
     }),
 );
 

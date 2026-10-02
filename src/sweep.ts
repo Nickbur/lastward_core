@@ -85,10 +85,7 @@ export async function runSweep(now: Date = new Date()): Promise<SweepResult> {
 
     const rows = await db.query.switches.findMany({
         where: or(
-            and(
-                or(eq(switches.state, 'active'), eq(switches.state, 'grace')),
-                lte(switches.nextDeadline, now),
-            ),
+            and(or(eq(switches.state, 'active'), eq(switches.state, 'grace')), lte(switches.nextDeadline, now)),
             and(eq(switches.state, 'fired'), gt(switches.firedAt, retryFloor)),
         ),
     });
@@ -271,7 +268,7 @@ async function main(): Promise<void> {
     // eslint-disable-next-line no-console
     console.log(
         `[sweep] scanned ${r.scanned}: warned ${r.warned}, fired ${r.fired}, published ${r.published}, ` +
-        `delivered ${r.delivered}, skipped ${r.skipped}, failed ${r.failed}`,
+            `delivered ${r.delivered}, skipped ${r.skipped}, failed ${r.failed}`,
     );
     await pool.end();
 }

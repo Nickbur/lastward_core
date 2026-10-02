@@ -59,12 +59,7 @@ export interface DueWarning {
  * passed, but the switch has not yet fired (fire time < graceEnd). A warning whose
  * offset lands at/after the grace end is dropped — no point warning after firing.
  */
-export function dueWarnings(
-    nextDeadline: Date,
-    warnings: WarningStep[],
-    graceEnd: Date,
-    now: Date,
-): DueWarning[] {
+export function dueWarnings(nextDeadline: Date, warnings: WarningStep[], graceEnd: Date, now: Date): DueWarning[] {
     const out: DueWarning[] = [];
     warnings.forEach((step, index) => {
         const fireAt = addHours(nextDeadline, step.offsetHours);

@@ -137,11 +137,7 @@ export async function upsertSwitch(
     return { row, created };
 }
 
-async function replaceRecipients(
-    tx: Tx,
-    switchId: string,
-    incoming: CreateSwitchInput['recipients'],
-): Promise<void> {
+async function replaceRecipients(tx: Tx, switchId: string, incoming: CreateSwitchInput['recipients']): Promise<void> {
     const existing = await tx.query.switchRecipients.findMany({
         where: eq(switchRecipients.switchId, switchId),
         columns: { id: true },
@@ -166,11 +162,7 @@ async function replaceRecipients(
     if (toDelete.length) await tx.delete(switchRecipients).where(inArray(switchRecipients.id, toDelete));
 }
 
-async function replaceActions(
-    tx: Tx,
-    switchId: string,
-    incoming: CreateSwitchInput['actions'],
-): Promise<void> {
+async function replaceActions(tx: Tx, switchId: string, incoming: CreateSwitchInput['actions']): Promise<void> {
     const existing = await tx.query.switchActions.findMany({
         where: eq(switchActions.switchId, switchId),
         columns: { id: true },
@@ -232,10 +224,7 @@ export async function disarmSwitch(id: string): Promise<SwitchWithChildren> {
     if (!row) throw new NotFoundError('switch_not_found');
 
     const now = new Date();
-    await db
-        .update(switches)
-        .set({ state: 'disarmed', disarmedAt: now, updatedAt: now })
-        .where(eq(switches.id, id));
+    await db.update(switches).set({ state: 'disarmed', disarmedAt: now, updatedAt: now }).where(eq(switches.id, id));
 
     const updated = await getSwitch(id);
     if (!updated) throw new Error('disarm_failed');
@@ -285,7 +274,10 @@ export async function putPayload(
             .returning();
         return row ?? existing;
     }
-    const [row] = await db.insert(switchPayloads).values({ switchId, actionId, ...fields }).returning();
+    const [row] = await db
+        .insert(switchPayloads)
+        .values({ switchId, actionId, ...fields })
+        .returning();
     if (!row) throw new Error('payload_upsert_failed');
     return row;
 }
@@ -295,11 +287,7 @@ export async function putPayload(
 const RELEASE_TOKEN_BYTES = 32;
 
 /** Mint a URL-safe single-recipient release token. */
-export async function issueReleaseToken(
-    switchId: string,
-    recipientId: string,
-    expiresAt: Date,
-): Promise<string> {
+export async function issueReleaseToken(switchId: string, recipientId: string, expiresAt: Date): Promise<string> {
     const token = randomBytes(RELEASE_TOKEN_BYTES).toString('base64url');
     await db.insert(releaseTokens).values({ token, switchId, recipientId, expiresAt });
     return token;
@@ -381,15 +369,15 @@ export async function getReleaseBundle(token: string, now: Date = new Date()): P
                 config: a.config,
                 payload: p
                     ? {
-                        mode: p.mode,
-                        ciphertext: p.ciphertext,
-                        wrappedKey: p.wrappedKey,
-                        salt: p.salt,
-                        nonce: p.nonce,
-                        algo: p.algo,
-                        blobRef: p.blobRef,
-                        readableContent: p.readableContent,
-                    }
+                          mode: p.mode,
+                          ciphertext: p.ciphertext,
+                          wrappedKey: p.wrappedKey,
+                          salt: p.salt,
+                          nonce: p.nonce,
+                          algo: p.algo,
+                          blobRef: p.blobRef,
+                          readableContent: p.readableContent,
+                      }
                     : null,
             };
         }),

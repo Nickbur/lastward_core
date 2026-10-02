@@ -1,10 +1,5 @@
 import { createRequire } from 'node:module';
-import Fastify, {
-    type FastifyError,
-    type FastifyInstance,
-    type FastifyReply,
-    type FastifyRequest,
-} from 'fastify';
+import Fastify, { type FastifyError, type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
 import { env } from './env.js';

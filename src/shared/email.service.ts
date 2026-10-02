@@ -68,10 +68,10 @@ export async function sendWarningEmail(
         text: `Your Lastward switch "${opts.title}" is waiting for a check-in.\nIf you don't check in, it will fire on ${when}.\nCheck in from your Lastward client (instance: ${opts.checkinUrl}).`,
         html: shell(
             `<p style="color:#b45309;font-size:13px;margin:0 0 4px;text-transform:uppercase;letter-spacing:1px">Check-in needed</p>` +
-            `<h2 style="margin:0 0 8px">${escapeHtml(opts.title)}</h2>` +
-            `<p style="color:#444;margin:0 0 12px">Your switch is waiting for a check-in. If you don't check in, it will fire on <b>${when}</b>.</p>` +
-            `<p style="color:#444;margin:0 0 12px">Open your Lastward client to check in. Instance: <a href="${opts.checkinUrl}" style="color:#2563eb">${opts.checkinUrl}</a></p>` +
-            `<p style="color:#888;font-size:13px">If this wasn't expected, review your switch.</p>`,
+                `<h2 style="margin:0 0 8px">${escapeHtml(opts.title)}</h2>` +
+                `<p style="color:#444;margin:0 0 12px">Your switch is waiting for a check-in. If you don't check in, it will fire on <b>${when}</b>.</p>` +
+                `<p style="color:#444;margin:0 0 12px">Open your Lastward client to check in. Instance: <a href="${opts.checkinUrl}" style="color:#2563eb">${opts.checkinUrl}</a></p>` +
+                `<p style="color:#888;font-size:13px">If this wasn't expected, review your switch.</p>`,
         ),
     });
 }
@@ -102,15 +102,15 @@ export async function sendFireEmail(
         .join('');
     const releaseHtml = opts.releaseUrl
         ? `<p style="color:#444;margin:16px 0 4px">Some items were left for you securely. Open them here:</p>` +
-        `<p style="margin:4px 0 16px"><a href="${opts.releaseUrl}" style="color:#2563eb;font-weight:600">Open what was left for you</a></p>` +
-        `<p style="color:#888;font-size:13px">You'll need the passphrase the sender shared with you. We can't read the content and can't recover the passphrase.</p>`
+          `<p style="margin:4px 0 16px"><a href="${opts.releaseUrl}" style="color:#2563eb;font-weight:600">Open what was left for you</a></p>` +
+          `<p style="color:#888;font-size:13px">You'll need the passphrase the sender shared with you. We can't read the content and can't recover the passphrase.</p>`
         : '';
     const publicUrls = (opts.publicUrls ?? []).filter(Boolean);
     const publicHtml = publicUrls.length
         ? `<p style="color:#444;margin:16px 0 4px">Public pages were published:</p>` +
-        publicUrls
-            .map((u) => `<p style="margin:2px 0"><a href="${u}" style="color:#2563eb">${escapeHtml(u)}</a></p>`)
-            .join('')
+          publicUrls
+              .map((u) => `<p style="margin:2px 0"><a href="${u}" style="color:#2563eb">${escapeHtml(u)}</a></p>`)
+              .join('')
         : '';
     const textParts = [
         opts.recipientName ? `Hello ${opts.recipientName},` : 'Hello,',
@@ -127,13 +127,13 @@ export async function sendFireEmail(
         text: textParts.join('\n\n'),
         html: shell(
             `<p style="color:#444;margin:0 0 8px">${hello}</p>` +
-            `<h2 style="margin:0 0 8px">Something was left for you</h2>` +
-            `<p style="color:#444;margin:0 0 8px">This was set up in advance through Lastward ("${escapeHtml(
-                opts.switchTitle,
-            )}") and released to you now.</p>` +
-            messagesHtml +
-            releaseHtml +
-            publicHtml,
+                `<h2 style="margin:0 0 8px">Something was left for you</h2>` +
+                `<p style="color:#444;margin:0 0 8px">This was set up in advance through Lastward ("${escapeHtml(
+                    opts.switchTitle,
+                )}") and released to you now.</p>` +
+                messagesHtml +
+                releaseHtml +
+                publicHtml,
         ),
     });
 }

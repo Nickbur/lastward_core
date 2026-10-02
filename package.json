@@ -18,7 +18,9 @@
         "db:migrate:prod": "node dist/db/migrate.js",
         "sweep": "tsx src/sweep.ts",
         "sweep:prod": "node dist/sweep.js",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "format": "prettier --write .",
+        "format:check": "prettier --check ."
     },
     "dependencies": {
         "@fastify/cors": "^11.3.0",
@@ -36,6 +38,7 @@
         "@types/nodemailer": "^7.0.2",
         "@types/pg": "^8.15.5",
         "drizzle-kit": "^0.31.4",
+        "prettier": "3.9.9",
         "tsx": "^4.20.4",
         "typescript": "^5.9.2"
     }

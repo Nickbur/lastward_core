@@ -165,13 +165,22 @@ export const putPayloadSchema = z
     .superRefine((p, ctx) => {
         if (p.mode === 'zk') {
             if (!p.ciphertext && !p.blobRef) {
-                ctx.addIssue({ code: 'custom', path: ['ciphertext'], message: 'zk payload needs ciphertext or blobRef' });
+                ctx.addIssue({
+                    code: 'custom',
+                    path: ['ciphertext'],
+                    message: 'zk payload needs ciphertext or blobRef',
+                });
             }
-            if (!p.wrappedKey) ctx.addIssue({ code: 'custom', path: ['wrappedKey'], message: 'zk payload needs wrappedKey' });
+            if (!p.wrappedKey)
+                ctx.addIssue({ code: 'custom', path: ['wrappedKey'], message: 'zk payload needs wrappedKey' });
             if (!p.salt) ctx.addIssue({ code: 'custom', path: ['salt'], message: 'zk payload needs salt' });
             if (!p.nonce) ctx.addIssue({ code: 'custom', path: ['nonce'], message: 'zk payload needs nonce' });
         } else if (!p.readableContent) {
-            ctx.addIssue({ code: 'custom', path: ['readableContent'], message: 'readable payload needs readableContent' });
+            ctx.addIssue({
+                code: 'custom',
+                path: ['readableContent'],
+                message: 'readable payload needs readableContent',
+            });
         }
     });
 
