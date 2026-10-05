@@ -5,7 +5,7 @@
     "description": "Lastward continuity core — a minimal, self-contained, self-hostable server for a zero-knowledge digital dead man's switch. AGPL-3.0. Implements the same wire protocol as the Lastward cloud plus the self-host-only public_page action.",
     "type": "module",
     "engines": {
-        "node": ">=22.12.0"
+        "node": ">=24.16.0"
     },
     "scripts": {
         "switch_to_dev": "node -e \"require('fs').copyFileSync('env/env.dev','.env')\"",
@@ -39,7 +39,7 @@
     },
     "devDependencies": {
         "@eslint/js": "10.0.1",
-        "@types/node": "26.6.4",
+        "@types/node": "24.19.1",
         "@types/nodemailer": "8.0.2",
         "@types/pg": "8.23.1",
         "drizzle-kit": "0.31.11",

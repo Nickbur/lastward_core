@@ -1,5 +1,5 @@
 # ── build stage ──────────────────────────────────────────────────────────────
-FROM node:22-bookworm-slim AS build
+FROM node:24-bookworm-slim AS build
 WORKDIR /app
 
 # Install all dependencies (incl. dev) for the TypeScript build.
@@ -12,7 +12,7 @@ COPY src ./src
 RUN npm run build
 
 # ── runtime stage ────────────────────────────────────────────────────────────
-FROM node:22-bookworm-slim AS runtime
+FROM node:24-bookworm-slim AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 
