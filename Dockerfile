@@ -6,10 +6,11 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install
 
-# Compile to ./dist (NodeNext ESM, .js specifiers).
+# Compile to ./dist (NodeNext ESM, .js specifiers). Compile only: `npm run build` is the
+# full quality gate (Prettier, ESLint) and runs before a push.
 COPY tsconfig.json ./
 COPY src ./src
-RUN npm run build
+RUN npx tsc -p tsconfig.json
 
 # ── runtime stage ────────────────────────────────────────────────────────────
 FROM node:24-bookworm-slim AS runtime
